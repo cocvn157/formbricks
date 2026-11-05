@@ -44,11 +44,10 @@ export const renderSurveyInline = (props: SurveyContainerProps) => {
 const withCustomCssRelease = (
   onClose: SurveyContainerProps["onClose"],
   owner: number
-): SurveyContainerProps["onClose"] => {
-  if (!onClose) return onClose;
+): NonNullable<SurveyContainerProps["onClose"]> => {
   return () => {
     releaseCustomCss(owner);
-    onClose();
+    onClose?.();
   };
 };
 

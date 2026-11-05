@@ -161,8 +161,13 @@ describe("renderSurvey custom CSS teardown", () => {
     expect(getCustomStyle()?.textContent).toContain("green");
   });
 
-  test("a host without onClose still gets none", () => {
-    expect(renderModal(undefined)).toBeUndefined();
+  test("a modal app survey without a host onClose still releases its custom CSS on close", () => {
+    const onClose = renderModal(undefined);
+    expect(getCustomStyle()?.textContent).toContain("fb-survey");
+
+    onClose?.();
+
+    expect(getCustomStyle()).toBeNull();
   });
 
   test("exposes removeCustomCss for hosts that tear a survey down without closing it", () => {
@@ -188,6 +193,20 @@ describe("renderSurvey inline onClose", () => {
     seen.onClose?.();
 
     expect(hostOnClose).toHaveBeenCalledTimes(1);
+  });
+
+  test("an inline app survey without a host onClose releases its custom CSS on close", () => {
+    document.body.innerHTML = '<div id="survey-container"></div>';
+
+    renderInline({
+      survey: { id: "survey-1", type: "app", languages: [] },
+      customCss: COMPILED,
+    } as unknown as Partial<SurveyContainerProps>);
+    expect(document.getElementById("formbricks__custom-css")?.textContent).toContain("fb-survey");
+
+    seen.onClose?.();
+
+    expect(document.getElementById("formbricks__custom-css")).toBeNull();
   });
 
   test("an inline link survey still gets no onClose", () => {
