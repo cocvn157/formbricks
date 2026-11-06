@@ -161,8 +161,30 @@ describe("renderSurvey custom CSS teardown", () => {
     expect(getCustomStyle()?.textContent).toContain("green");
   });
 
-  test("a host without onClose still gets none", () => {
-    expect(renderModal(undefined)).toBeUndefined();
+  test("closing a modal app survey without a host onClose still removes its custom CSS", () => {
+    const onClose = renderModal(undefined);
+    expect(onClose).toBeTypeOf("function");
+    expect(getCustomStyle()?.textContent).toContain("fb-survey");
+
+    onClose?.();
+
+    expect(getCustomStyle()).toBeNull();
+  });
+
+  test("closing an inline app survey without a host onClose still removes its custom CSS", () => {
+    document.body.innerHTML = '<div id="survey-container"></div>';
+
+    renderInline({
+      survey: { id: "survey-1", type: "app", languages: [] },
+      customCss: COMPILED,
+      onClose: undefined,
+    } as unknown as Partial<SurveyContainerProps>);
+    expect(seen.onClose).toBeTypeOf("function");
+    expect(getCustomStyle()?.textContent).toContain("fb-survey");
+
+    seen.onClose?.();
+
+    expect(getCustomStyle()).toBeNull();
   });
 
   test("exposes removeCustomCss for hosts that tear a survey down without closing it", () => {
